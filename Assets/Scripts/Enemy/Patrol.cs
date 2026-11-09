@@ -1,68 +1,77 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(DistanceChecker))]
 
 public class Patrol : MonoBehaviour
 {
-    [SerializeField] private Transform _checkpoint1;
-    [SerializeField] private Transform _checkpoint2;
+    [field: SerializeField] public float Speed { get; private set; } = 1f;
 
-    [SerializeField] private float _speed = 1f;
+    [SerializeField] private Transform[] _checkpoints;
 
-    private Rigidbody2D _rigidbody2D;
+    public bool IsPatroling { get; private set; } = true;
     
     private Transform _currentCheckpoint;
-
-    private bool _isPatroling = false;
+    private DistanceChecker _distanceChecker;
 
     private void Awake()
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();    
-
+        _distanceChecker = GetComponent<DistanceChecker>();
         SetRandomCheckpoint();
-        _isPatroling = true;
-    }
-
-    private void FixedUpdate()
-    {
-        if (_isPatroling)
-            Move();
     }
 
     public void StartPatrol()
     {
         SetFarestCheckpoint();
-        _isPatroling = true;
+        IsPatroling = true;
     }
 
     public void StopPatrol()
     {
-        _isPatroling = false;
+        IsPatroling = false;
     }
 
-    private void Move()
+    public void CheckDistanceToCheckpoint(out Vector2 newCheckpoint)
     {
-        Vector2 direction = (_currentCheckpoint.position - transform.position).normalized;
-        _rigidbody2D.velocity = new Vector2(direction.x * _speed, _rigidbody2D.velocity.y);
+        newCheckpoint = Vector2.zero;
 
-        float minDistance = 0.2f;
-
-        if ((_currentCheckpoint.position - transform.position).sqrMagnitude < minDistance * minDistance)
+        if (_distanceChecker.IsCloseEnough(_currentCheckpoint.position))
+        {
             SwitchCheckpoint();
+            newCheckpoint = _currentCheckpoint.position;
+        }
+    }
+
+    public Vector2 GetCheckpoint()
+    {
+        return _currentCheckpoint.position;
+    }
+
+    public void SetFarestCheckpoint()
+    {
+        float distance = 0;
+
+        foreach (Transform checkpoint in _checkpoints)
+        {
+            float distanceToCheckpoint = (checkpoint.position - transform.position).sqrMagnitude;
+            
+            if (distanceToCheckpoint > distance)
+            {
+                distance = distanceToCheckpoint; ;
+                _currentCheckpoint = checkpoint;
+            }
+        }
     }
 
     private void SwitchCheckpoint()
     {
-        _currentCheckpoint = _currentCheckpoint == _checkpoint1 ? _checkpoint2 : _checkpoint1;
+        Transform previousCheckpoint = _currentCheckpoint;
+
+        while (previousCheckpoint == _currentCheckpoint)
+            SetRandomCheckpoint();
     }
 
     private void SetRandomCheckpoint()
     {
-        _currentCheckpoint = Random.Range(0, 2) == 0 ? _checkpoint1 : _checkpoint2;
-    }
-
-    private void SetFarestCheckpoint()
-    {
-        _currentCheckpoint = ((_checkpoint1.position - transform.position).sqrMagnitude > (_checkpoint2.position - transform.position).sqrMagnitude) ? _checkpoint1 : _checkpoint2;
+        _currentCheckpoint = _checkpoints[Random.Range(0, _checkpoints.Length)];
     }
 }

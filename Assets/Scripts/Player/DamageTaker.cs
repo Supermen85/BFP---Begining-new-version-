@@ -3,11 +3,15 @@ using UnityEngine;
 
 public class DamageTaker : MonoBehaviour
 {
-    public Action<Vector2, int> Damaged;
+    public Action<Vector2, int> DamagedByEnemy;
+    public Action<int> DamagedByPlayer;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.TryGetComponent<Enemy>(out Enemy enemy))
-            Damaged?.Invoke(enemy.transform.position, enemy.Damage);
+            DamagedByEnemy?.Invoke(enemy.transform.position, enemy.Damage);
+        
+        if (collision.gameObject.TryGetComponent<Player>(out Player player))
+            DamagedByPlayer?.Invoke(player.Damage);
     }
 }

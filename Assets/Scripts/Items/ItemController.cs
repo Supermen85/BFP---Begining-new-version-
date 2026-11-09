@@ -30,16 +30,10 @@ public class ItemController : MonoBehaviour
     private void Picking(Item item)
     {
         if (item.GetType() == typeof(Coin))
-        {
-            Debug.Log("Pick coin");
             _player.PickCoin((Coin)item);
-        }
 
         if (item.GetType() == typeof(Medkit))
-        {
-            Debug.Log("Pick Medkit");
             _player.PickMedkit((Medkit)item);
-        }
 
         item.Spawn();
     }

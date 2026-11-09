@@ -18,15 +18,6 @@ public class Wallet : MonoBehaviour
         if (value <= 0)
             return;
 
-        Debug.Log($"Вы подобрали монеты: {value}.");
-
         _coins += value;
-
-        Show();
-    }
-
-    private void Show()
-    {
-        Debug.Log($"У вас монет: {_coins}.");
     }
 }

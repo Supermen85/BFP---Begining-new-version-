@@ -1,25 +1,23 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Mover))]
-[RequireComponent(typeof(Controller))]
+[RequireComponent(typeof(MovementController))]
 [RequireComponent(typeof(DamageTaker))]
 [RequireComponent(typeof(Health))]
 [RequireComponent(typeof(Wallet))]
 
 public class Player : MonoBehaviour
 {
-    private Mover _mover;
-    private Controller _controller;
-    private GroundController _groundController;
+    [field: SerializeField] public int Damage { get; private set; } = 1;
+
+    private MovementController _movementController;
     private DamageTaker _damageTaker;
     private Health _health;
     private Wallet _wallet;
-        
+
     private void Awake()
     {
-        _mover = GetComponent<Mover>();
-        _controller = GetComponent<Controller>();
-        _groundController = GetComponentInChildren<GroundController>();
+        _movementController = GetComponent<MovementController>();
+        
         _damageTaker = GetComponent<DamageTaker>();
         _health = GetComponent<Health>();
         _wallet = GetComponent<Wallet>();
@@ -27,20 +25,37 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        _controller.Jumped += Jump;
-        _controller.RunnedLeft += RunLeft;
-        _controller.RunnedRight += RunRight;
-        _groundController.Grounded += Land;
-        _damageTaker.Damaged += TakeDamage;
+        _damageTaker.DamagedByEnemy += TakeDamage;
+        _health.Died += Die;
     }
 
     private void OnDisable()
     {
-        _controller.Jumped -= Jump;
-        _controller.RunnedLeft -= RunLeft;
-        _controller.RunnedRight -= RunRight;
-        _groundController.Grounded -= Land;
-        _damageTaker.Damaged -= TakeDamage;
+        _damageTaker.DamagedByEnemy -= TakeDamage;
+        _health.Died -= Die;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+            _movementController.Jump();
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+            _movementController.StartRunLeft();
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+            _movementController.StartRunRight();
+
+        if (Input.GetKeyUp(KeyCode.LeftArrow))
+            _movementController.StopRunLeft();
+
+        if (Input.GetKeyUp(KeyCode.RightArrow))
+            _movementController.StopRunRight();
+    }
+
+    private void FixedUpdate()
+    {
+        _movementController.Run();
     }
 
     public void PickMedkit(Medkit medkit)
@@ -57,27 +72,11 @@ public class Player : MonoBehaviour
     {
         _health.TakeDamge(damage);
         
-        _mover.Knockback(enemyPosition);
+        _movementController.Knockback(enemyPosition);
     }
 
-    private void Jump()
+    private void Die()
     {
-        if (_groundController.CanJump())
-            _mover.Jump();
-    }
-
-    private void Land()
-    {
-        _mover.Land();
-    }
-
-    private void RunLeft(bool isRunning)
-    {
-        _mover.RunLeft(isRunning);
-    }
-
-    private void RunRight(bool isRunning)
-    {
-        _mover.RunRight(isRunning);
+        this.gameObject.SetActive(false);
     }
 }

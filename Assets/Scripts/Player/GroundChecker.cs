@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class GroundController : MonoBehaviour
+public class GroundChecker : MonoBehaviour
 {
     public Action Grounded;
 

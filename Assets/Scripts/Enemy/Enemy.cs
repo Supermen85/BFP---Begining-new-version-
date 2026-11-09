@@ -1,45 +1,54 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Patrol))]
-[RequireComponent(typeof(Pursuit))]
-[RequireComponent(typeof(EnemyHealth))]
+[RequireComponent(typeof(Health))]
+[RequireComponent(typeof(DamageTaker))]
+[RequireComponent(typeof(EnemyMovementController))]
 
 public class Enemy : MonoBehaviour
 {
     [field: SerializeField] public int Damage { get; private set; } = 1;
 
-    [SerializeField] private PlayerDetector _playerDetector;
-
-    private Patrol _patrol;
-    private Pursuit _pursuit;
+    private Health _health;
+    private DamageTaker _damageTaker;
+    private EnemyMovementController _enemyMovementController;
 
     private void Awake()
     {
-        _patrol = GetComponent<Patrol>();
-        _pursuit = GetComponent<Pursuit>();
+        _health = GetComponent<Health>();
+        _damageTaker = GetComponent<DamageTaker>();
+        _enemyMovementController = GetComponent<EnemyMovementController>();
     }
 
     private void OnEnable()
     {
-        _playerDetector.PlayerEntered += StartPursuit;
-        _playerDetector.PlayerExited += StopPursuit;
+        _health.Died += Die;
+        _damageTaker.DamagedByPlayer += TakeDamage;
     }
 
     private void OnDisable()
     {
-        _playerDetector.PlayerEntered -= StartPursuit;
-        _playerDetector.PlayerExited -= StopPursuit;
+        _health.Died -= Die;
+        _damageTaker.DamagedByPlayer -= TakeDamage;
     }
 
-    private void StartPursuit(Vector2 playerPosition)
+    private void FixedUpdate()
     {
-        _patrol.StopPatrol();
-        _pursuit.StartPuruit(playerPosition);
+        if (_enemyMovementController.IsPursuiting())
+            _enemyMovementController.RefreshPlayerPosition();
+
+        if (_enemyMovementController.IsPatroling())
+            _enemyMovementController.CheckDistanceToCheckpoint();
+
+        _enemyMovementController.Move();
     }
 
-    private void StopPursuit()
+    private void Die()
     {
-        _pursuit.StopPursuit();
-        _patrol.StartPatrol();
+        gameObject.SetActive(false);
+    }
+
+    private void TakeDamage(int damage)
+    {
+        _health.TakeDamge(damage);
     }
 }
