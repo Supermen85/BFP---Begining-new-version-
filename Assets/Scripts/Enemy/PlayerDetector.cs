@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class PlayerDetector : MonoBehaviour
 {
-    public Action<Transform> PlayerEntered;
-    public Action PlayerExited;
+    public event Action<Transform> PlayerEntered;
+    public event Action PlayerExited;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

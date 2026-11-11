@@ -4,6 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(DamageTaker))]
 [RequireComponent(typeof(Health))]
 [RequireComponent(typeof(Wallet))]
+[RequireComponent(typeof(InputReader))]
+[RequireComponent(typeof(CoinCollector))]
+[RequireComponent(typeof(MedkitCollector))]
 
 public class Player : MonoBehaviour
 {
@@ -13,49 +16,48 @@ public class Player : MonoBehaviour
     private DamageTaker _damageTaker;
     private Health _health;
     private Wallet _wallet;
+    private InputReader _inputReader;
+
+    private CoinCollector _coinCollector;
+    private MedkitCollector _medkitCollector;
 
     private void Awake()
     {
         _movementController = GetComponent<MovementController>();
-        
         _damageTaker = GetComponent<DamageTaker>();
         _health = GetComponent<Health>();
         _wallet = GetComponent<Wallet>();
+        _inputReader = GetComponent<InputReader>();
+        _coinCollector = GetComponent<CoinCollector>();
+        _medkitCollector = GetComponent<MedkitCollector>();
     }
 
     private void OnEnable()
     {
         _damageTaker.DamagedByEnemy += TakeDamage;
         _health.Died += Die;
+        _inputReader.Jumped += Jump;
+        _coinCollector.Picked += PickCoin;
+        _medkitCollector.Picked -= PickMedkit;
     }
 
     private void OnDisable()
     {
         _damageTaker.DamagedByEnemy -= TakeDamage;
         _health.Died -= Die;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-            _movementController.Jump();
-
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-            _movementController.StartRunLeft();
-
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-            _movementController.StartRunRight();
-
-        if (Input.GetKeyUp(KeyCode.LeftArrow))
-            _movementController.StopRunLeft();
-
-        if (Input.GetKeyUp(KeyCode.RightArrow))
-            _movementController.StopRunRight();
+        _inputReader.Jumped -= Jump;
+        _coinCollector.Picked -= PickCoin;
+        _medkitCollector.Picked -= PickMedkit;
     }
 
     private void FixedUpdate()
     {
-        _movementController.Run();
+        _movementController.Run(_inputReader.Direction);
+    }
+
+    private void Jump()
+    {
+        _movementController.Jump();
     }
 
     public void PickMedkit(Medkit medkit)

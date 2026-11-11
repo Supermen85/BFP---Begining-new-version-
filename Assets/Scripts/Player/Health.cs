@@ -5,7 +5,7 @@ public class Health : MonoBehaviour
 {
     [SerializeField] private int _maxAmount = 3;
 
-    public Action Died;
+    public event Action Died;
 
     private int _amount;
 

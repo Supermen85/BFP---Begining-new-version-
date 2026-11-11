@@ -19,12 +19,13 @@ public class Mover : MonoBehaviour
         _rigidbody2D.AddForce(knockbackDirection.normalized * _knockbackForce, ForceMode2D.Impulse);
     }
 
-    public void Run(Vector2 direction)
+    public void RunLeft()
     {
-        if (direction == Vector2.left)
-            _rigidbody2D.velocity = new Vector2(-1 * _speed, _rigidbody2D.velocity.y);
+        _rigidbody2D.velocity = new Vector2(-1 * _speed, _rigidbody2D.velocity.y);
+    }
 
-        if (direction == Vector2.right)
-            _rigidbody2D.velocity = new Vector2(_speed, _rigidbody2D.velocity.y);
+    public void RunRight()
+    {
+        _rigidbody2D.velocity = new Vector2(_speed, _rigidbody2D.velocity.y);
     }
 }

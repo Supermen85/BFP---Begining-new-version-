@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class GroundChecker : MonoBehaviour
 {
-    public Action Grounded;
+    public event Action Grounded;
 
-    private bool _isGrounded = false;
+    public bool IsGrounded { get; private set; } = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.GetComponent<Floor>() != null)
         {
-            _isGrounded = true;
+            IsGrounded = true;
             Grounded?.Invoke();
         }
     }
@@ -19,11 +19,6 @@ public class GroundChecker : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.GetComponent<Floor>() != null)
-            _isGrounded = false;
-    }
-
-    public bool CanJump()
-    {
-        return _isGrounded;
+            IsGrounded = false;
     }
 }

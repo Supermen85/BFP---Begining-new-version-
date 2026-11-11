@@ -12,8 +12,6 @@ public class MovementController : MonoBehaviour
     private AnimationController _animationController;
     private GroundChecker _groundChecker;
 
-    private Vector2 _direction = Vector2.zero;
-
     private void Awake()
     {
         _mover = GetComponent<Mover>();
@@ -37,63 +35,24 @@ public class MovementController : MonoBehaviour
         _mover.Knockback(enemyPosition);
     }
 
-    public void Run()
+    public void Run(Vector2 direction)
     {
-        if (_direction != Vector2.zero)
-            _mover.Run(_direction);
+        if (direction == Vector2.left)
+            _mover.RunLeft();
+
+        if (direction == Vector2.right)
+            _mover.RunRight();
+
+        _animationController.SetAnimation(direction);
     }
 
     public void Jump()
     {
-        if (_groundChecker.CanJump())
+        if (_groundChecker.IsGrounded)
         {
             _jumper.Jump();
             _animationController.Jump();
         }
-    }
-
-    public void StartRunLeft()
-    {
-        if (_direction == Vector2.zero)
-            _direction = Vector2.left;
-
-        if (_direction == Vector2.right)
-            _direction = Vector2.zero;
-        
-        _animationController.SetAnimation(_direction);
-    }
-
-    public void StopRunLeft()
-    {
-        if (_direction == Vector2.zero)
-            _direction = Vector2.right;
-
-        if (_direction == Vector2.left)
-            _direction = Vector2.zero;
-
-        _animationController.SetAnimation(_direction);
-    }
-
-    public void StartRunRight()
-    {
-        if (_direction == Vector2.zero)
-            _direction = Vector2.right;
-
-        if (_direction == Vector2.left)
-            _direction = Vector2.zero;
-    
-        _animationController.SetAnimation(_direction);
-    }
-
-    public void StopRunRight()
-    {
-        if (_direction == Vector2.zero)
-            _direction = Vector2.left;
-
-        if (_direction == Vector2.right)
-            _direction = Vector2.zero;
-
-        _animationController.SetAnimation(_direction);
     }
 
     private void Land()

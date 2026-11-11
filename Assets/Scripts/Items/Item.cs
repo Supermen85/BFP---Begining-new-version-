@@ -1,36 +1,20 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-
-[RequireComponent(typeof(ItemSpawner))]
 
 public class Item : MonoBehaviour
 {
     [SerializeField] protected int _value = 1;
 
-    public Action<Item> Picked;
-    
-    protected ItemSpawner _spawner;
+    public event Action Picked;
 
-    private void Awake()
+    public void SetPosition(Vector2 position)
     {
-        _spawner = GetComponent<ItemSpawner>();
+        transform.position = position;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void Pick()
     {
-        if (collision.GetComponent<Player>() != null)
-            Picked?.Invoke(this);
-    }
-
-    public void SetSpawnPoints(List<Transform> points)
-    {
-        _spawner.SetSpawnPoints(points);
-    }
-
-    public void Spawn()
-    {
-        _spawner.Spawn();
+        Picked?.Invoke();
     }
 
     public int GetValue()

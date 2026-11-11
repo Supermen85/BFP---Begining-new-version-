@@ -2,28 +2,38 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemSpawner : MonoBehaviour
+public class ItemSpawner<T> : MonoBehaviour where T : Item
 {
-   private List<Transform> _spawnPoints;
+    [SerializeField] private List<Transform> _spawnPoints;
+    [SerializeField] private T _itemPrefab;
 
-    private Renderer _renderer;
-    private Collider2D _collider;
+    private T _item;
+    private Vector2 _spawnPosition;
 
     private void Awake()
     {
-        _renderer = GetComponent<Renderer>();
-        _collider = GetComponent<Collider2D>();
+        _item = Instantiate(_itemPrefab, transform.position, Quaternion.identity);
+        _item.gameObject.SetActive(false);
     }
 
-    public void SetSpawnPoints(List<Transform> spawnPoints)
+    private void Start()
     {
-        _spawnPoints = spawnPoints;
+        ReSpawn();
     }
 
-    public void Spawn()
+    private void OnEnable()
     {
-        _renderer.enabled = false;
-        _collider.enabled = false;
+        _item.Picked += ReSpawn;
+    }
+
+    private void OnDisable()
+    {
+        _item.Picked -= ReSpawn;
+    }
+
+    private void ReSpawn()
+    {
+        _item.gameObject.SetActive(false);
 
         SetRandomPosition();
 
@@ -32,7 +42,7 @@ public class ItemSpawner : MonoBehaviour
 
     private void SetRandomPosition()
     {
-        transform.position = _spawnPoints[Random.Range(0, _spawnPoints.Count)].position;
+        _spawnPosition = _spawnPoints[Random.Range(0, _spawnPoints.Count)].position;
     }
 
     private IEnumerator Enable()
@@ -42,20 +52,20 @@ public class ItemSpawner : MonoBehaviour
 
         yield return wait;
 
-        while (CanSpawn() == false)
+        while (IsPlayerFarEnough() == false)
         {
             yield return wait;
         }
 
-        _renderer.enabled = true;
-        _collider.enabled = true;
+        _item.SetPosition(_spawnPosition);
+        _item.gameObject.SetActive(true);
     }
 
-    private bool CanSpawn()
+    private bool IsPlayerFarEnough()
     {
         float radius = 0.4f;
         
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(_spawnPosition, radius);
 
         foreach (Collider2D collider in colliders)
         {
