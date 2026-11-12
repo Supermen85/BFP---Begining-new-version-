@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [field: SerializeField] public int Damage { get; private set; } = 1;
+    [field: SerializeField] public int Damage { get; private set; } = 15;
 
     private Health _health;
     private DamageTaker _damageTaker;

@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [field: SerializeField] public int Damage { get; private set; } = 1;
+    [field: SerializeField] public int Damage { get; private set; } = 25;
 
     private MovementController _movementController;
     private DamageTaker _damageTaker;
@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
         _health.Died += Die;
         _inputReader.Jumped += Jump;
         _coinCollector.Picked += PickCoin;
-        _medkitCollector.Picked -= PickMedkit;
+        _medkitCollector.Picked += PickMedkit;
     }
 
     private void OnDisable()
