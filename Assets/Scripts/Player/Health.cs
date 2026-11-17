@@ -1,32 +1,37 @@
 using System;
 using UnityEngine;
 
-public class Health : MonoBehaviour
+public class Health : MonoBehaviour, IBarable
 {
-    [field: SerializeField] public int MaxAmount { get; private set; } = 100;
+    [SerializeField] private float _maxAmount = 100;
 
     public event Action Died;
     public event Action<float, float> ValueChanged;
 
-    private int _amount;
+    private float _amount;
 
     private void Awake()
     {
-        _amount = MaxAmount;
+        _amount = _maxAmount;
     }
 
-    public void Heal(Medkit medkit)
+    public float GetMaxValue()
     {
-        _amount = Mathf.Min(MaxAmount, _amount + medkit.GetValue());
-
-        ValueChanged?.Invoke(_amount, MaxAmount);
+        return _maxAmount;
     }
 
-    public void TakeDamge(int damage)
+    public void Heal(float amount)
+    {
+        _amount = Mathf.Min(_maxAmount, _amount + amount);
+
+        ValueChanged?.Invoke(_amount, _maxAmount);
+    }
+
+    public void TakeDamge(float damage)
     {
         _amount = Mathf.Max(0, _amount - damage);
 
-        ValueChanged?.Invoke(_amount, MaxAmount);
+        ValueChanged?.Invoke(_amount, _maxAmount);
 
         if (IsDead())
             Died?.Invoke();

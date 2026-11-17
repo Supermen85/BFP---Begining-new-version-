@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Item : MonoBehaviour
 {
-    [SerializeField] protected int _value = 1;
+    [SerializeField] protected float _value = 1;
 
     public event Action Picked;
 
@@ -17,7 +17,7 @@ public class Item : MonoBehaviour
         Picked?.Invoke();
     }
 
-    public int GetValue()
+    public float GetValue()
     {
         return _value;
     }

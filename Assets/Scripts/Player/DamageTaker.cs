@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class DamageTaker : MonoBehaviour
 {
-    public event Action<Vector2, int> DamagedByEnemy;
-    public event Action<int> DamagedByPlayer;
+    public event Action<Vector2, float> DamagedByEnemy;
+    public event Action<float> DamagedByPlayer;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

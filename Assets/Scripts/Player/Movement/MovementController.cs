@@ -3,7 +3,6 @@ using UnityEngine;
 [RequireComponent(typeof(Jumper))]
 [RequireComponent(typeof(Mover))]
 [RequireComponent(typeof(AnimationController))]
-[RequireComponent(typeof(GroundChecker))]
 
 public class MovementController : MonoBehaviour
 {

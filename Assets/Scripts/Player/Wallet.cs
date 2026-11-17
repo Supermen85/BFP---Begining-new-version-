@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class Wallet : MonoBehaviour
 {
-    [SerializeField] private int _startingCoins = 0;
+    [SerializeField] private float _startingCoins = 0;
 
-    private int _coins;
+    private float _coins;
 
     private void Awake()
     {
@@ -13,7 +13,7 @@ public class Wallet : MonoBehaviour
 
     public void PickCoin(Coin coin)
     {
-        int value = coin.GetValue();
+        float value = coin.GetValue();
         
         if (value <= 0)
             return;

@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class Bar<T> : MonoBehaviour where T : BarRenderer
 {
-    [SerializeField] private Health _health;
+    [SerializeField] private MonoBehaviour _barableObject;
+
+    public IBarable _barable => _barableObject as IBarable;
 
     private T _barRender;
 
@@ -13,17 +15,17 @@ public class Bar<T> : MonoBehaviour where T : BarRenderer
 
     private void Start()
     {
-        _barRender.SetStartingValue(_health.MaxAmount);
+        _barRender.SetStartingValue(_barable.GetMaxValue());
     }
 
     private void OnEnable()
     {
-        _health.ValueChanged += ChangeValue;
+        _barable.ValueChanged += ChangeValue;
     }
 
     private void OnDisable()
     {
-        _health.ValueChanged -= ChangeValue;
+        _barable.ValueChanged -= ChangeValue;
     }
 
     private void ChangeValue(float value, float maxValue)

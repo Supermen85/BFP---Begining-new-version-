@@ -4,11 +4,15 @@ using UnityEngine;
 public class InputReader : MonoBehaviour
 {
     public event Action Jumped;
+    public event Action AbilityActivated;
 
     public Vector2 Direction { get; private set; } = Vector2.zero;
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Q))
+            AbilityActivated?.Invoke();
+
         if (Input.GetKeyDown(KeyCode.UpArrow))
             Jumped?.Invoke();
 

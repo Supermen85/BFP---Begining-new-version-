@@ -9,6 +9,9 @@ public class SmoothBarRenderer : BarRenderer
 
     public override void ChangeValue(float value, float maxValue)
     {
+        if (SliderBar.maxValue != maxValue)
+            SliderBar.maxValue = maxValue;
+
         if (_isChanging)
         {
             StopCoroutine(_changeCoroutine);

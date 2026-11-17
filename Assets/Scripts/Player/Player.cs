@@ -2,52 +2,58 @@ using UnityEngine;
 
 [RequireComponent(typeof(MovementController))]
 [RequireComponent(typeof(DamageTaker))]
-[RequireComponent(typeof(Health))]
 [RequireComponent(typeof(Wallet))]
 [RequireComponent(typeof(InputReader))]
-[RequireComponent(typeof(CoinCollector))]
-[RequireComponent(typeof(MedkitCollector))]
 
 public class Player : MonoBehaviour
 {
-    [field: SerializeField] public int Damage { get; private set; } = 25;
+    [field: SerializeField] public float Damage { get; private set; } = 25;
 
-    private MovementController _movementController;
-    private DamageTaker _damageTaker;
     private Health _health;
     private Wallet _wallet;
+
     private InputReader _inputReader;
+    private LifeDrain _lifeDrain;
+    private MovementController _movementController;
+    private DamageTaker _damageTaker;
 
     private CoinCollector _coinCollector;
     private MedkitCollector _medkitCollector;
 
     private void Awake()
     {
+        _health = GetComponentInChildren<Health>();
+        _wallet = GetComponent<Wallet>();
+
+        _inputReader = GetComponent<InputReader>();
+        _lifeDrain = GetComponentInChildren<LifeDrain>();
         _movementController = GetComponent<MovementController>();
         _damageTaker = GetComponent<DamageTaker>();
-        _health = GetComponent<Health>();
-        _wallet = GetComponent<Wallet>();
-        _inputReader = GetComponent<InputReader>();
-        _coinCollector = GetComponent<CoinCollector>();
-        _medkitCollector = GetComponent<MedkitCollector>();
+ 
+        _coinCollector = GetComponentInChildren<CoinCollector>();
+        _medkitCollector = GetComponentInChildren<MedkitCollector>();
     }
 
     private void OnEnable()
     {
-        _damageTaker.DamagedByEnemy += TakeDamage;
+        _damageTaker.DamagedByEnemy += DamageByEnemy;
         _health.Died += Die;
         _inputReader.Jumped += Jump;
+        _inputReader.AbilityActivated += VampirismActivate;
         _coinCollector.Picked += PickCoin;
         _medkitCollector.Picked += PickMedkit;
+        _lifeDrain.Healed += LifeDrain;
     }
 
     private void OnDisable()
     {
-        _damageTaker.DamagedByEnemy -= TakeDamage;
+        _damageTaker.DamagedByEnemy -= DamageByEnemy;
         _health.Died -= Die;
         _inputReader.Jumped -= Jump;
+        _inputReader.AbilityActivated -= VampirismActivate;
         _coinCollector.Picked -= PickCoin;
         _medkitCollector.Picked -= PickMedkit;
+        _lifeDrain.Healed -= LifeDrain;
     }
 
     private void FixedUpdate()
@@ -55,25 +61,44 @@ public class Player : MonoBehaviour
         _movementController.Run(_inputReader.Direction);
     }
 
+    private void VampirismActivate()
+    {
+        _lifeDrain.Activate();
+    }
+
     private void Jump()
     {
         _movementController.Jump();
     }
 
-    public void PickMedkit(Medkit medkit)
+    private void LifeDrain(float value)
     {
-        _health.Heal(medkit);
+        _health.Heal(value);
     }
 
-    public void PickCoin(Coin coin)
+    private void PickMedkit(Medkit medkit)
+    {
+        _health.Heal(medkit.GetValue());
+    }
+
+    private void PickCoin(Coin coin)
     {
         _wallet.PickCoin(coin);
     }
 
-    private void TakeDamage(Vector2 enemyPosition, int damage)
+    private void DamageByEnemy(Vector2 enemyPosition, float damage)
+    {
+        TakeDamage(damage);
+        KnockBack(enemyPosition);
+    }
+
+    private void TakeDamage(float damage)
     {
         _health.TakeDamge(damage);
-        
+    }
+
+    private void KnockBack(Vector2 enemyPosition)
+    {
         _movementController.Knockback(enemyPosition);
     }
 
