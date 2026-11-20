@@ -1,17 +1,17 @@
 using System;
 using UnityEngine;
 
-public class DamageTaker : MonoBehaviour
+public abstract class DamageTaker<T> : MonoBehaviour where T : IAttackable
 {
-    public event Action<Vector2, float> DamagedByEnemy;
-    public event Action<float> DamagedByPlayer;
+    public event Action<Vector3, float> DamagedWithKnockback;
+    public event Action<float> Damaged;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.TryGetComponent<Enemy>(out Enemy enemy))
-            DamagedByEnemy?.Invoke(enemy.transform.position, enemy.Damage);
-        
-        if (collision.gameObject.TryGetComponent<Player>(out Player player))
-            DamagedByPlayer?.Invoke(player.Damage);
+        if (collision.gameObject.TryGetComponent(out T attackable))
+        {
+            DamagedWithKnockback?.Invoke(attackable.Position, attackable.Damage);
+            Damaged?.Invoke(attackable.Damage);
+        }
     }
 }

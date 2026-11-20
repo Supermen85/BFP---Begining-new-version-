@@ -1,78 +1,33 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Duration))]
-[RequireComponent(typeof(Cooldown))]
-
-public class Timer : MonoBehaviour, IBarable
+public class Timer : MonoBehaviour
 {
-    private Duration _duration;
-    private Cooldown _cooldown;
+    [SerializeField] private float _pause = 0.1f;
 
-    public event Action<float, float> ValueChanged;
     public event Action IsElapsed;
-    public event Action Tick;
+    public event Action<float> TimeSkipped;
 
-    public bool CanCast { get; private set; } = true;
-
-    private void Awake()
+    public void Activate(float seconds)
     {
-        _duration = GetComponent<Duration>();
-        _cooldown = GetComponent<Cooldown>();
+        StartCoroutine(Change(seconds));
     }
 
-    private void OnEnable()
+    private IEnumerator Change(float seconds)
     {
-        _duration.ValueChanged += ValueChangeOnDuration;
-        _duration.IsElapsed += ChangeState;
-        _cooldown.ValueChanged += ValueChangeOnCooldown;
-        _cooldown.IsElapsed += Recharge;
-    }
+        float elapsedTime = 0;
+        var pause = new WaitForSeconds(_pause);
 
-    private void OnDisable()
-    {
-        _duration.ValueChanged -= ValueChangeOnDuration;
-        _duration.IsElapsed -= ChangeState;
-        _cooldown.ValueChanged -= ValueChangeOnCooldown;
-        _cooldown.IsElapsed -= Recharge;
+        while (elapsedTime < seconds)
+        {
+            elapsedTime += _pause;
 
-    }
+            TimeSkipped?.Invoke(elapsedTime);
 
-    public float GetMaxValue()
-    {
-        return _duration.Seconds;
-    }
+            yield return pause;
+        }
 
-    public void StartDuration()
-    {
-        CanCast = false;
-        _duration.Activate();
-    }
-
-    private void ChangeState()
-    {
         IsElapsed?.Invoke();
-        StartCooldown();
-    }
-
-    private void StartCooldown()
-    {
-        _cooldown.Activate();
-    }
-
-    private void Recharge()
-    {
-        CanCast = true;
-    }
-
-    private void ValueChangeOnDuration(float value1, float value2)
-    {
-        Tick?.Invoke();
-        ValueChanged?.Invoke(value1, value2);
-    }
-
-    private void ValueChangeOnCooldown(float value1, float value2)
-    {
-        ValueChanged?.Invoke(value1, value2);
     }
 }

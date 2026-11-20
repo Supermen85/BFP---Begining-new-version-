@@ -6,17 +6,17 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
+    [SerializeField] private GroundChecker _groundChecker;
+
     private Mover _mover;
     private Jumper _jumper;
     private AnimationController _animationController;
-    private GroundChecker _groundChecker;
 
     private void Awake()
     {
         _mover = GetComponent<Mover>();
         _jumper = GetComponent<Jumper>();
         _animationController = GetComponent<AnimationController>();
-        _groundChecker = GetComponentInChildren<GroundChecker>();
     }
 
     private void OnEnable()

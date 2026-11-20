@@ -8,7 +8,7 @@ public class Jumper : MonoBehaviour
 
     private void Awake()
     {
-        _rigidbody2D = GetComponentInParent<Rigidbody2D>();
+        _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
     public void Jump()

@@ -1,33 +1,37 @@
 using UnityEngine;
 
-[RequireComponent(typeof(DamageTaker))]
+[RequireComponent(typeof(Health))]
+[RequireComponent(typeof(EnemyDamageTaker))]
 [RequireComponent(typeof(EnemyMovementController))]
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IAttackable
 {
     [field: SerializeField] public float Damage { get; private set; } = 15;
 
+    public Vector3 Position => transform.position;
+
+    
     private Health _health;
-    private DamageTaker _damageTaker;
+    private EnemyDamageTaker _enemyDamageTaker;
     private EnemyMovementController _enemyMovementController;
 
     private void Awake()
     {
-        _health = GetComponentInChildren<Health>();
-        _damageTaker = GetComponent<DamageTaker>();
+        _health = GetComponent<Health>();
+        _enemyDamageTaker = GetComponent<EnemyDamageTaker>();
         _enemyMovementController = GetComponent<EnemyMovementController>();
     }
 
     private void OnEnable()
     {
         _health.Died += Die;
-        _damageTaker.DamagedByPlayer += TakeDamage;
+        _enemyDamageTaker.Damaged += TakeDamage;
     }
 
     private void OnDisable()
     {
         _health.Died -= Die;
-        _damageTaker.DamagedByPlayer -= TakeDamage;
+        _enemyDamageTaker.Damaged -= TakeDamage;
     }
 
     private void FixedUpdate()

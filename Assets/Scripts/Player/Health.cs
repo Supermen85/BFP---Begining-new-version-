@@ -1,23 +1,21 @@
 using System;
 using UnityEngine;
 
-public class Health : MonoBehaviour, IBarable
+public class Health : Changeable
 {
     [SerializeField] private float _maxAmount = 100;
 
-    public event Action Died;
-    public event Action<float, float> ValueChanged;
+    public override float GetMaxValue => _maxAmount;
+    private bool IsDead => _amount <= 0;
 
     private float _amount;
+
+    public event Action Died;
+    public override event Action<float, float> ValueChanged;
 
     private void Awake()
     {
         _amount = _maxAmount;
-    }
-
-    public float GetMaxValue()
-    {
-        return _maxAmount;
     }
 
     public void Heal(float amount)
@@ -33,12 +31,7 @@ public class Health : MonoBehaviour, IBarable
 
         ValueChanged?.Invoke(_amount, _maxAmount);
 
-        if (IsDead())
+        if (IsDead)
             Died?.Invoke();
-    }
-
-    private bool IsDead()
-    {
-        return _amount <= 0;
     }
 }

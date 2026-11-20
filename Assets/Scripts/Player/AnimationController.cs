@@ -6,12 +6,7 @@ public class AnimationController : MonoBehaviour
     public static readonly int IsRunningLeft = Animator.StringToHash(nameof(IsRunningLeft));
     public static readonly int IsRunningRight = Animator.StringToHash(nameof(IsRunningRight));
 
-    private Animator _animator;
-
-    private void Awake()
-    {
-        _animator = GetComponentInChildren<Animator>();
-    }
+    [SerializeField] private Animator _animator;
 
     public void Jump()
     {
